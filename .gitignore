@@ -4,6 +4,7 @@
 *.dll
 *.so
 *.dylib
+*.qodo
 cmd/api/api
 cmd/api/doctor-orlinskaya
 
