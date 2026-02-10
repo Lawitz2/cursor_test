@@ -57,7 +57,7 @@ func (h *CartHandler) AddToCart(c *gin.Context) {
 	}
 
 	var pID pgtype.UUID
-	if err := pID.UnmarshalJSON([]byte(input.ProductID)); err != nil {
+	if err := pID.Scan(input.ProductID); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid product_id"})
 		return
 	}
@@ -111,7 +111,7 @@ func (h *CartHandler) UpdateItem(c *gin.Context) {
 	}
 
 	var pID pgtype.UUID
-	if err := pID.UnmarshalJSON([]byte(productIDStr)); err != nil {
+	if err := pID.Scan(productIDStr); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid product_id"})
 		return
 	}
@@ -135,7 +135,7 @@ func (h *CartHandler) RemoveItem(c *gin.Context) {
 	}
 
 	var pID pgtype.UUID
-	if err := pID.UnmarshalJSON([]byte(productIDStr)); err != nil {
+	if err := pID.Scan(productIDStr); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid product_id"})
 		return
 	}

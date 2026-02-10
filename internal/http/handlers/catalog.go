@@ -32,7 +32,7 @@ func (h *CatalogHandler) ListProducts(c *gin.Context) {
 
 	if categoryIDStr != "" {
 		var categoryID pgtype.UUID
-		if err := categoryID.UnmarshalJSON([]byte(categoryIDStr)); err != nil {
+		if err := categoryID.Scan(categoryIDStr); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid category_id"})
 			return
 		}
@@ -79,7 +79,7 @@ func (h *CatalogHandler) Index(c *gin.Context) {
 	categoryIDStr := c.Query("category_id")
 	if categoryIDStr != "" {
 		var categoryID pgtype.UUID
-		if err := categoryID.UnmarshalJSON([]byte(categoryIDStr)); err == nil {
+		if err := categoryID.Scan(categoryIDStr); err == nil {
 			products, _ = h.repo.ListProductsByCategory(ctx, categoryID)
 		}
 	}
