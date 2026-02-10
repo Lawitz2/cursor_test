@@ -54,4 +54,29 @@ INSERT INTO product_media (product_id, type, url, sort_order) VALUES
 -- 6. CARTS (IDs: c111... "c" is valid hex)
 INSERT INTO carts (id, user_id, guest_token, status) VALUES
                                                          ('c1111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111', NULL, 'active'),
-                                                         ('c222
+                                                         ('c2222222-2222-2222-2222-222222222222', NULL, 'guest_token_abc123', 'abandoned');
+
+INSERT INTO cart_items (cart_id, product_id, qty, price_snapshot) VALUES
+                                                                      ('c1111111-1111-1111-1111-111111111111', 'b1111111-1111-1111-1111-111111111111', 1, 999.00),
+                                                                      ('c1111111-1111-1111-1111-111111111111', 'b4444444-4444-4444-4444-444444444444', 2, 9.99),
+                                                                      ('c2222222-2222-2222-2222-222222222222', 'b3333333-3333-3333-3333-333333333333', 1, 19.99);
+
+-- 7. ORDERS (IDs: d111... "d" is valid hex)
+INSERT INTO orders (id, order_number, user_id, status, total_amount, delivery_method, delivery_price, delivery_address_json) VALUES
+                                                                                                                                 ('d1111111-1111-1111-1111-111111111111', 'ORD-2023-001', '22222222-2222-2222-2222-222222222222', 'paid', 1519.50, 'courier', 20.00, '{"city": "New York", "street": "5th Ave"}'),
+                                                                                                                                 ('d2222222-2222-2222-2222-222222222222', 'ORD-2023-002', '11111111-1111-1111-1111-111111111111', 'awaiting_payment', 1019.00, 'pickup', 0.00, NULL);
+
+-- Order Items
+INSERT INTO order_items (order_id, product_id, name_snapshot, sku_snapshot, price, qty, line_total) VALUES
+    ('d1111111-1111-1111-1111-111111111111', 'b2222222-2222-2222-2222-222222222222', 'Laptop Pro 15', 'ELEC-LPT-002', 1499.50, 1, 1499.50);
+
+INSERT INTO order_items (order_id, product_id, name_snapshot, sku_snapshot, price, qty, line_total) VALUES
+                                                                                                        ('d2222222-2222-2222-2222-222222222222', 'b1111111-1111-1111-1111-111111111111', 'Smartphone X', 'ELEC-PHN-001', 999.00, 1, 999.00),
+                                                                                                        ('d2222222-2222-2222-2222-222222222222', 'b4444444-4444-4444-4444-444444444444', 'Ceramic Coffee Mug', 'HOME-MUG-001', 10.00, 2, 20.00);
+
+-- 8. PAYMENTS
+INSERT INTO payment_attempts (order_id, provider, status, amount, provider_payment_id) VALUES
+                                                                                           ('d1111111-1111-1111-1111-111111111111', 'tbank', 'succeeded', 1519.50, 'pay_ext_987654'),
+                                                                                           ('d2222222-2222-2222-2222-222222222222', 'tbank', 'failed', 1019.00, 'pay_ext_123456');
+
+COMMIT;

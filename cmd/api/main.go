@@ -38,6 +38,9 @@ func main() {
 	cartRepo := repository.NewCartRepository(queries)
 	cartHandler := handlers.NewCartHandler(cartRepo)
 
+	userRepo := repository.NewUserRepository(queries)
+	authHandler := handlers.NewAuthHandler(userRepo)
+
 	// 4. Настраиваем режим Gin
 	if cfg.Env == "production" {
 		gin.SetMode(gin.ReleaseMode)
@@ -66,6 +69,13 @@ func main() {
 	// --- API v1 ---
 	v1 := router.Group("/api/v1")
 	{
+		// Аутентификация
+		auth := v1.Group("/auth")
+		{
+			auth.POST("/request-code", authHandler.RequestCode)
+			auth.POST("/verify-code", authHandler.VerifyCode)
+		}
+
 		// Каталог
 		v1.GET("/categories", catalogHandler.ListCategories)
 		v1.GET("/products", catalogHandler.ListProducts)
