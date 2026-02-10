@@ -1,0 +1,52 @@
+{{ define "title" }}{{ .product.Name }}{{ end }}
+
+{{ define "content" }}
+<nav aria-label="breadcrumb">
+  <ul>
+    <li><a href="/">Каталог</a></li>
+    <li>{{ .product.Name }}</li>
+  </ul>
+</nav>
+
+<article>
+    <div class="grid">
+        <div>
+            <img src="https://via.placeholder.com/400x400?text={{ .product.Name }}" alt="{{ .product.Name }}">
+        </div>
+        <div>
+            <h1>{{ .product.Name }}</h1>
+            <p class="sku">Артикул: {{ .product.Sku }}</p>
+            <div class="price" style="font-size: 1.5rem; margin-bottom: 1rem;">
+                {{ .product.Price }} {{ if .product.Currency.Valid }}{{ .product.Currency.String }}{{ end }}
+                {{ if .product.OldPrice.Valid }}
+                <span class="old-price">{{ .product.OldPrice }}</span>
+                {{ end }}
+            </div>
+            <button class="contrast">Добавить в корзину</button>
+            <hr>
+            <p>{{ if .product.Description.Valid }}{{ .product.Description.String }}{{ end }}</p>
+        </div>
+    </div>
+    
+    {{ if .product.Composition.Valid }}
+    <details>
+        <summary>Состав</summary>
+        <p>{{ .product.Composition.String }}</p>
+    </details>
+    {{ end }}
+    
+    {{ if .product.Indications.Valid }}
+    <details>
+        <summary>Показания</summary>
+        <p>{{ .product.Indications.String }}</p>
+    </details>
+    {{ end }}
+    
+    {{ if .product.Usage.Valid }}
+    <details>
+        <summary>Способ применения</summary>
+        <p>{{ .product.Usage.String }}</p>
+    </details>
+    {{ end }}
+</article>
+{{ end }}

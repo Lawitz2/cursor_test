@@ -1,0 +1,42 @@
+{{ define "title" }}Каталог{{ end }}
+
+{{ define "content" }}
+<div class="grid">
+    <aside>
+        <nav>
+            <ul>
+                <li><strong>Категории</strong></li>
+                <li><a href="/">Все товары</a></li>
+                {{ range .categories }}
+                <li><a href="/?category_id={{ .ID }}">{{ .Name }}</a></li>
+                {{ end }}
+            </ul>
+        </nav>
+    </aside>
+    <section>
+        <h1>Наши товары</h1>
+        <div class="grid">
+            {{ range .products }}
+            <article class="product-card">
+                <header>
+                    <a href="/products/{{ .Slug }}"><strong>{{ .Name }}</strong></a>
+                </header>
+                <p>{{ if .ShortDescription.Valid }}{{ .ShortDescription.String }}{{ end }}</p>
+                <footer>
+                    <div class="price">
+                        {{ .Price }} {{ if .Currency.Valid }}{{ .Currency.String }}{{ end }}
+                        {{ if .OldPrice.Valid }}
+                        <span class="old-price">{{ .OldPrice }}</span>
+                        {{ end }}
+                    </div>
+                    <br>
+                    <button class="add-to-cart" data-id="{{ .ID }}">В корзину</button>
+                </footer>
+            </article>
+            {{ else }}
+            <p>Товары не найдены.</p>
+            {{ end }}
+        </div>
+    </section>
+</div>
+{{ end }}
