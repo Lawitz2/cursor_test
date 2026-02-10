@@ -1,0 +1,117 @@
+{{ define "title" }}Корзина{{ end }}
+
+{{ define "content" }}
+<h1>Ваша корзина</h1>
+
+{{ if .items }}
+<table role="grid">
+    <thead>
+        <tr>
+            <th>Товар</th>
+            <th>Цена</th>
+            <th>Кол-во</th>
+            <th>Итого</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .items }}
+        <tr data-product-id="{{ .ProductID }}">
+            <td>
+                <a href="/products/{{ .ProductSlug }}"><strong>{{ .ProductName }}</strong></a>
+                <br><small class="sku">Арт: {{ .ProductSku }}</small>
+            </td>
+            <td>{{ .CurrentPrice }} {{ if .Currency.Valid }}{{ .Currency.String }}{{ end }}</td>
+            <td>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <button class="outline secondary qty-btn" data-action="dec" style="padding: 0.2rem 0.5rem;">-</button>
+                    <span class="qty-val">{{ .Qty }}</span>
+                    <button class="outline secondary qty-btn" data-action="inc" style="padding: 0.2rem 0.5rem;">+</button>
+                </div>
+            </td>
+            <td>
+                {{/* Простой расчет итого в шаблоне для MVP */}}
+                <span class="line-total"></span> {{ if .Currency.Valid }}{{ .Currency.String }}{{ end }}
+            </td>
+            <td>
+                <a href="#" class="remove-item" style="color: var(--del-color);">Удалить</a>
+            </td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+
+<div style="text-align: right;">
+    <h3>Итого: <span id="cart-total">0</span> RUB</h3>
+    <a href="/checkout" role="button" class="primary">Оформить заказ</a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const updateTotals = () => {
+        let total = 0;
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const price = parseFloat(row.cells[1].innerText);
+            const qty = parseInt(row.querySelector('.qty-val').innerText);
+            const lineTotal = price * qty;
+            row.querySelector('.line-total').innerText = lineTotal.toFixed(2);
+            total += lineTotal;
+        });
+        document.getElementById('cart-total').innerText = total.toFixed(2);
+    };
+
+    updateTotals();
+
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const productId = row.getAttribute('data-product-id');
+            let qty = parseInt(row.querySelector('.qty-val').innerText);
+            
+            if (this.getAttribute('data-action') === 'inc') qty++;
+            else qty--;
+
+            if (qty < 1) return;
+
+            fetch(`/api/v1/cart/items/${productId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ qty: qty })
+            }).then(res => {
+                if (res.ok) {
+                    row.querySelector('.qty-val').innerText = qty;
+                    updateTotals();
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll('.remove-item').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const row = this.closest('tr');
+            const productId = row.getAttribute('data-product-id');
+
+            fetch(`/api/v1/cart/items/${productId}`, {
+                method: 'DELETE'
+            }).then(res => {
+                if (res.ok) {
+                    row.remove();
+                    updateTotals();
+                    if (document.querySelectorAll('tbody tr').length === 0) {
+                        location.reload();
+                    }
+                }
+            });
+        });
+    });
+});
+</script>
+
+{{ else }}
+<div style="text-align: center; padding: 3rem 0;">
+    <p>Ваша корзина пока пуста.</p>
+    <a href="/" role="button" class="outline">Перейти к покупкам</a>
+</div>
+{{ end }}
+{{ end }}

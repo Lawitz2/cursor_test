@@ -31,8 +31,12 @@ func main() {
 
 	// 3. Инициализация репозиториев и хендлеров
 	queries := db_sqlc.New(pool)
+	
 	catalogRepo := repository.NewCatalogRepository(queries)
 	catalogHandler := handlers.NewCatalogHandler(catalogRepo)
+
+	cartRepo := repository.NewCartRepository(queries)
+	cartHandler := handlers.NewCartHandler(cartRepo)
 
 	// 4. Настраиваем режим Gin
 	if cfg.Env == "production" {
@@ -57,13 +61,24 @@ func main() {
 	// --- Публичные страницы (SSR) ---
 	router.GET("/", catalogHandler.Index)
 	router.GET("/products/:slug", catalogHandler.ProductDetail)
+	router.GET("/cart", cartHandler.CartView)
 
 	// --- API v1 ---
 	v1 := router.Group("/api/v1")
 	{
+		// Каталог
 		v1.GET("/categories", catalogHandler.ListCategories)
 		v1.GET("/products", catalogHandler.ListProducts)
 		v1.GET("/products/:slug", catalogHandler.GetProduct)
+
+		// Корзина
+		cart := v1.Group("/cart")
+		{
+			cart.GET("/", cartHandler.GetCart)
+			cart.POST("/items", cartHandler.AddToCart)
+			cart.PATCH("/items/:product_id", cartHandler.UpdateItem)
+			cart.DELETE("/items/:product_id", cartHandler.RemoveItem)
+		}
 	}
 
 	// 6. Запуск сервера

@@ -32,6 +32,41 @@
         <hr>
         <small>&copy; 2024 Доктор Орлинская. Все права защищены.</small>
     </footer>
+
+    <script>
+    // Глобальный обработчик для кнопок "В корзину"
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('add-to-cart')) {
+            const productId = e.target.getAttribute('data-id');
+            if (!productId) return;
+
+            e.target.disabled = true;
+            e.target.innerText = 'Добавляем...';
+
+            fetch('/api/v1/cart/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ product_id: productId, qty: 1 })
+            }).then(res => {
+                if (res.ok) {
+                    e.target.innerText = 'Добавлено!';
+                    setTimeout(() => {
+                        e.target.disabled = false;
+                        e.target.innerText = 'В корзину';
+                    }, 2000);
+                } else {
+                    alert('Ошибка при добавлении в корзину');
+                    e.target.disabled = false;
+                    e.target.innerText = 'В корзину';
+                }
+            }).catch(err => {
+                console.error(err);
+                e.target.disabled = false;
+                e.target.innerText = 'В корзину';
+            });
+        }
+    });
+    </script>
 </body>
 </html>
 {{ end }}

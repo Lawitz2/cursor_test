@@ -22,7 +22,7 @@
                 <span class="old-price">{{ .product.OldPrice }}</span>
                 {{ end }}
             </div>
-            <button class="contrast">Добавить в корзину</button>
+            <button class="contrast add-to-cart" data-id="{{ .product.ID }}">Добавить в корзину</button>
             <hr>
             <p>{{ if .product.Description.Valid }}{{ .product.Description.String }}{{ end }}</p>
         </div>
